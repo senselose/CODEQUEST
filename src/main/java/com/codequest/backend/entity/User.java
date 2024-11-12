@@ -21,6 +21,7 @@ public class User {
     private String gender;
     private String nickName;
     private String grade;
+    private String password;
 
     // getter and setter
     public String getId() {
@@ -77,9 +78,11 @@ public class User {
     public void setGrade(String grade) {
         this.grade = grade;
     }
-
-
-    // Getter와 Setter
- 
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
     
 }

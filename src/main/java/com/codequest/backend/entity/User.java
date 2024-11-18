@@ -10,8 +10,9 @@ import javax.persistence.Id;
 @Entity
 public class User {
     
+    
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private String name;
     private int age;
@@ -23,6 +24,8 @@ public class User {
     private String grade;
     private String password;
 
+    // 기본 생성자
+    public User() {}
     // getter and setter
     public String getId() {
         return id;

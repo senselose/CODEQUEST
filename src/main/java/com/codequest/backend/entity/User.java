@@ -23,6 +23,7 @@ public class User {
     private String nickName;
     private String grade;
     private String password;
+    private String phone;
 
     // 기본 생성자
     public User() {}
@@ -86,6 +87,13 @@ public class User {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+    public void setPhone(String password) {
+        this.phone = phone;
     }
     
 }

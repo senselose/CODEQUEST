@@ -2,6 +2,8 @@ package com.codequest.backend.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import lombok.Data;
+import java.util.List;
 
 @Entity
 public class Board {
@@ -38,12 +40,12 @@ public class Board {
     private String location; // 위치 정보
 
     @Column(columnDefinition = "TEXT")
-    private String comments; // 댓글 (별도 테이블로 관리 가능)
+    @Convert(converter = CommentListConverter.class)
+    private List<Comment> comments;
 
     @Column(columnDefinition = "INT DEFAULT 0")
     private Integer likes = 0; // 좋아요 수
 
-    // Getters and Setters
     public Long getBoardId() {
         return boardId;
     }
@@ -78,6 +80,10 @@ public class Board {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Integer getViews() {
@@ -120,11 +126,11 @@ public class Board {
         this.location = location;
     }
 
-    public String getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(String comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
 
@@ -135,4 +141,7 @@ public class Board {
     public void setLikes(Integer likes) {
         this.likes = likes;
     }
+
+    // Getters and Setters
+    
 }

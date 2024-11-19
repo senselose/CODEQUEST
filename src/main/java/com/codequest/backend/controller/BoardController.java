@@ -49,18 +49,28 @@ public class BoardController {
     // 게시글 수정
     @PutMapping("/{id}")
     public Board updateBoard(@PathVariable Long id, @RequestBody Board boardDetails) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시물을 찾을 수 없습니다: " + id));
+    Board board = boardRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("게시물을 찾을 수 없습니다: " + id));
 
-        board.setTitle(boardDetails.getTitle());
-        board.setContent(boardDetails.getContent());
-        board.setCategory(boardDetails.getCategory());
-        board.setIsHidden(boardDetails.getIsHidden());
-        board.setLocation(boardDetails.getLocation());
-        board.setLikes(boardDetails.getLikes());
-        board.setViews(board.getViews() + 1); // 조회수 1 증가
-        return boardRepository.save(board);
+    // 제목, 내용 등 기본 정보 업데이트
+    board.setTitle(boardDetails.getTitle());
+    board.setContent(boardDetails.getContent());
+    board.setCategory(boardDetails.getCategory());
+    board.setIsHidden(boardDetails.getIsHidden());
+    board.setLocation(boardDetails.getLocation());
+    board.setLikes(boardDetails.getLikes());
+
+    // 조회수 증가
+    board.setViews(board.getViews() + 1);
+
+    // 댓글 업데이트
+    if (boardDetails.getComments() != null) {
+        board.setComments(boardDetails.getComments());
     }
+
+    return boardRepository.save(board);
+}
+
 
     // 게시글 삭제
     @DeleteMapping("/{id}")

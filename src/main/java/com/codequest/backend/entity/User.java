@@ -28,7 +28,11 @@ public class User {
     // 기본 생성자
     public User() {}
     // getter and setter
-
+    public User(String id, String password) {
+        this.id = id;
+        this.password = password;
+    }
+    
     public String getId() {
         return id;
     }

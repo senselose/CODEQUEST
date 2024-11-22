@@ -1,12 +1,18 @@
 package com.codequest.backend.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer{
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -21,4 +27,17 @@ public class WebConfig {
             }
         };
     }
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                ((MappingJackson2HttpMessageConverter) converter)
+                        .setSupportedMediaTypes(Arrays.asList(
+                                MediaType.APPLICATION_JSON,
+                                MediaType.APPLICATION_JSON_UTF8 // charset=UTF-8 지원 추가
+                        ));
+            }
+        }
+    }
+
 }

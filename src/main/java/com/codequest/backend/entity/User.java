@@ -32,7 +32,7 @@ public class User {
         this.id = id;
         this.password = password;
     }
-    
+
     public String getId() {
         return id;
     }
@@ -119,6 +119,10 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+    public User orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
     }
 
 }

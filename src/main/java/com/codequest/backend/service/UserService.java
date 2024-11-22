@@ -35,8 +35,8 @@ public class UserService {
         User foundUser = userRepository.findById(user.getId()).orElse(null);
         return foundUser != null && foundUser.getPassword().equals(user.getPassword());
     }
-       // 사용자 조회 (카카오 로그인)
-       public User findById(String id) {
+    // 사용자 조회 
+    public User findById(String id) {
         return userRepository.findById(id).orElse(null);
     }
     

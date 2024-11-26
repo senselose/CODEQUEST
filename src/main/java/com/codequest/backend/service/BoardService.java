@@ -26,12 +26,16 @@ public class BoardService {
     }
 
     // 모든 게시글을 페이지네이션하여 반환
+    // public Page<Board> getAllBoards(Pageable pageable) {
+    //     Pageable sortedByViews = PageRequest.of(
+    //             pageable.getPageNumber(),
+    //             pageable.getPageSize(),
+    //             Sort.by(Sort.Direction.ASC, "views")
+    //     );
+    //     return boardRepository.findAll(sortedByViews);
+    // }
     public Page<Board> getAllBoards(Pageable pageable) {
-        Pageable sortedByViews = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "views")
-        );
-        return boardRepository.findAll(sortedByViews);
+        // pageable의 정렬 조건을 그대로 사용하도록 설정
+        return boardRepository.findAll(pageable);
     }
 }

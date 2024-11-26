@@ -1,16 +1,13 @@
 package com.codequest.backend.entity;
-
 import java.time.LocalDate;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+
 @Entity
 public class User {
-    
-    
     // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private String id;
@@ -24,6 +21,7 @@ public class User {
     private String grade;
     private String password;
     private String phone;
+    private String provider; // "kakao" or "local"
 
     // 기본 생성자
     public User() {}
@@ -32,97 +30,77 @@ public class User {
         this.id = id;
         this.password = password;
     }
-
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public int getAge() {
         return age;
     }
-
     public void setAge(int age) {
         this.age = age;
     }
-
     public LocalDate getBirth() {
         return birth;
     }
-
     public void setBirth(LocalDate birth) {
         this.birth = birth;
     }
-
     public String getProfilePicturePath() {
         return profilePicturePath;
     }
-
     public void setProfilePicturePath(String profilePicturePath) {
         this.profilePicturePath = profilePicturePath;
     }
-
     public String getMail() {
         return mail;
     }
-
     public void setMail(String mail) {
         this.mail = mail;
     }
-
     public String getGender() {
         return gender;
     }
-
     public void setGender(String gender) {
         this.gender = gender;
     }
-
     public String getNickName() {
         return nickName;
     }
-
     public void setNickName(String nickName) {
         this.nickName = nickName;
     }
-
     public String getGrade() {
         return grade;
     }
-
     public void setGrade(String grade) {
         this.grade = grade;
     }
-
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
-
     public String getPhone() {
         return phone;
     }
-
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    public User orElseThrow(Object object) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    public String getProvider() {
+        return provider;
     }
 
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 }

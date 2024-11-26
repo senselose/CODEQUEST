@@ -56,7 +56,6 @@
 //         return ResponseEntity.ok(commentsWithLikeStatus);
 //     }
 
-
 //     // 댓글 작성
 //     @PostMapping("/board/{boardId}")
 //     public ResponseEntity<Comment> addCommentToBoard(@PathVariable Long boardId, @RequestBody Comment comment) {
@@ -92,7 +91,7 @@
 //     public ResponseEntity<Map<String, Object>> toggleCommentLike(@PathVariable Long commentId, @RequestParam String userId) {
 //         Comment comment = commentRepository.findById(commentId)
 //             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다: " + commentId));
-    
+
 //         User user = userService.findById(userId);
 //         if (user == null) {
 //             throw new RuntimeException("사용자를 찾을 수 없습니다: " + userId);
@@ -109,7 +108,6 @@
 
 //         return ResponseEntity.ok(response);
 //     }
-
 
 //     // 댓글 좋아요 상태 확인
 //     @GetMapping("/{commentId}/like-status")
@@ -130,9 +128,6 @@
 
 //         return ResponseEntity.ok(response);
 
-        
-
-
 //     // 댓글 좋아요 수 조회
 //     @GetMapping("/{commentId}/like-count")
 //     public ResponseEntity<Integer> getCommentLikeCount(@PathVariable Long commentId) {
@@ -151,7 +146,6 @@
 //     }
 // }
 
-
 package com.codequest.backend.controller;
 
 import com.codequest.backend.entity.Board;
@@ -167,13 +161,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comments")
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.7:3000"})
+@CrossOrigin(origins = { "http://localhost:3000", "http://192.168.0.7:3000" })
 public class CommentController {
 
     @Autowired
@@ -195,10 +190,9 @@ public class CommentController {
     @PostMapping("/{parentCommentId}/reply")
     public ResponseEntity<Comment> addReply(
             @PathVariable Long parentCommentId,
-            @RequestBody Comment replyRequest
-    ) {
+            @RequestBody Comment replyRequest) {
         System.out.println("Received nickname: " + replyRequest.getNickname());
-    System.out.println("Received content: " + replyRequest.getContent());
+        System.out.println("Received content: " + replyRequest.getContent());
         if (replyRequest.getNickname() == null || replyRequest.getContent() == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -206,8 +200,7 @@ public class CommentController {
         Comment reply = commentService.addReply(
                 parentCommentId,
                 replyRequest.getNickname(),
-                replyRequest.getContent()
-        );
+                replyRequest.getContent());
         return ResponseEntity.ok(reply);
     }
 
@@ -216,7 +209,16 @@ public class CommentController {
     public ResponseEntity<List<Comment>> getCommentsByBoardId(@PathVariable Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다: " + boardId));
+
         List<Comment> comments = commentRepository.findByBoard(board);
+
+        // Lazy Loading 강제 초기화
+        comments.forEach(comment -> {
+            if (comment.getChildComments() != null) {
+                comment.getChildComments().size();
+            }
+        });
+
         return ResponseEntity.ok(comments);
     }
 
@@ -232,7 +234,8 @@ public class CommentController {
 
     // 댓글 수정
     @PutMapping("/{commentId}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Long commentId, @RequestBody Comment updatedCommentDetails) {
+    public ResponseEntity<Comment> updateComment(@PathVariable Long commentId,
+            @RequestBody Comment updatedCommentDetails) {
         Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다: " + commentId));
         existingComment.setContent(updatedCommentDetails.getContent());
@@ -249,15 +252,16 @@ public class CommentController {
         commentRepository.delete(comment);
         return ResponseEntity.ok("댓글이 삭제되었습니다.");
     }
-        // 댓글 좋아요 토글
-        @PostMapping("/{commentId}/like")
-        public ResponseEntity<Map<String, Object>> toggleCommentLike(
-                @PathVariable Long commentId,
-                @RequestBody Map<String, String> payload) {
+
+    // 댓글 좋아요 토글
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<Map<String, Object>> toggleCommentLike(
+            @PathVariable Long commentId,
+            @RequestBody Map<String, String> payload) {
         String userId = payload.get("userId");
         Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다: " + commentId));
-    
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다: " + commentId));
+
         User user = userService.findById(userId);
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다: " + userId);
@@ -275,10 +279,10 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
-
     // 댓글 좋아요 상태 확인
     @GetMapping("/{commentId}/like-status")
-    public ResponseEntity<Map<String, Object>> getCommentLikeStatus(@PathVariable Long commentId, @RequestParam String userId) {
+    public ResponseEntity<Map<String, Object>> getCommentLikeStatus(@PathVariable Long commentId,
+            @RequestParam String userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다: " + commentId));
         User user = userService.findById(userId);
@@ -297,7 +301,6 @@ public class CommentController {
 
     }
 
-
     // 댓글 좋아요 수 조회
     @GetMapping("/{commentId}/like-count")
     public ResponseEntity<Integer> getCommentLikeCount(@PathVariable Long commentId) {
@@ -306,5 +309,5 @@ public class CommentController {
         int likeCount = commentLikesService.getLikeCount(comment);
         return ResponseEntity.ok(likeCount);
     }
-    
+
 }

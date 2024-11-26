@@ -55,6 +55,11 @@ public class Board {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
+
+    // @Column(columnDefinition = "INT DEFAULT 0")
+    // private int likesCount; // 좋아요 개수
+    
+
 }
 
 

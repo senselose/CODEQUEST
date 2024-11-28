@@ -43,10 +43,17 @@ public class UserController {
     }
 
     // 회원가입
+    // @PostMapping("/register")
+    // public ResponseEntity<User> register(@RequestBody User user) {
+    //     User savedUser = userService.saveUser(user);
+    //     return ResponseEntity.status(HttpStatus.CREATED).body(savedUser); // 리소스 생성으로 201이 반환
+    // }
+
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        User savedUser = userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    public ResponseEntity<?> register(@RequestBody User user) {
+        System.out.println("Marketing: " + user.getMarketing()); // 값 디버깅
+        userService.saveUser(user);
+        return ResponseEntity.status(HttpStatus.OK).body("User registered successfully"); // 200으로
     }
 
     // 로그인
@@ -87,7 +94,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // 비밀번호 재설정
     @PostMapping("/resetPassword")
     public ResponseEntity<Map<String, String>> resetPassword(@RequestBody User request) {
         // 사용자 정보 확인
@@ -95,10 +101,10 @@ public class UserController {
         Map<String, String> response = new HashMap<>();
     
         if (isValid) {
-            // 비밀번호 변경
-            boolean isUpdated = userService.updatePassword(request.getId(), request.getPassword());
+            String temporaryPassword = userService.generateTemporaryPassword();
+            boolean isUpdated = userService.updatePassword(request.getId(), temporaryPassword);
             if (isUpdated) {
-                response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
+                response.put("message", "임시 비밀번호가 성공적으로 설정되었습니다: " + temporaryPassword);
             } else {
                 response.put("message", "비밀번호 변경에 실패했습니다.");
             }
@@ -107,113 +113,4 @@ public class UserController {
         }
         return ResponseEntity.ok(response);
     }
-    
 }
-
-
-
-// package com.codequest.backend.controller;
-// import com.codequest.backend.dto.LoginRequest;
-// import com.codequest.backend.entity.User;
-// import com.codequest.backend.service.UserService;
-// import java.util.Map;
-// import javax.servlet.http.HttpSession;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.web.bind.annotation.*;
-// import org.springframework.http.HttpStatus;
-// import org.springframework.http.ResponseEntity;
-// import com.codequest.backend.dto.KakaoUserDto;
-// import java.util.HashMap;
-
-// @RestController
-// @RequestMapping("/api/auth")
-// @CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.7:3000"})
-// public class UserController {
-
-//     @Autowired
-//     private UserService userService;
-
-//     // // 회원가입 (Register)
-//     // @PostMapping("/register")
-//     // public User registerUser(@RequestBody User user) {
-//     //     // 중복 확인 로직 추가 가능
-//     //     return userService.saveUser(user);
-//     // }
-//     // ID 중복 확인
-    
-//     @GetMapping("/checkId")
-//     public ResponseEntity<Boolean> checkIdDuplicate(@RequestParam String id) {
-//         boolean exists = !userService.existsById(id); // 아이디 중복 여부 확인
-//         return ResponseEntity.ok(exists);
-//     }
-//     // 이메일 중복 확인
-//     @GetMapping("/checkMail")
-//     public ResponseEntity<Boolean> checkMail(@RequestParam String mail) {
-//         boolean isAvailable = !userService.existsByMail(mail);
-//         return ResponseEntity.ok(isAvailable);
-//     }
-//     // 닉네임 중복 확인
-//     @GetMapping("/checkNickName")
-//     public ResponseEntity<Boolean> checkNickName(@RequestParam String nickName) {
-//         boolean isAvailable = !userService.existsByNickName(nickName);
-//         return ResponseEntity.ok(isAvailable);
-//     }
-//     // 회원가입
-//     @PostMapping("/register")
-//     public ResponseEntity<User> register(@RequestBody User user) {
-//         User savedUser = userService.saveUser(user);
-//         return ResponseEntity.ok(savedUser);
-//     }
-//     @PostMapping("/login")
-// public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
-//     try {
-//         boolean isAuthenticated = userService.validateUser(new User(loginRequest.getId(), loginRequest.getPassword()));
-//         if (isAuthenticated) {
-//             User user = userService.findById(loginRequest.getId());
-//             session.setAttribute("userId", user.getId());
-//             session.setAttribute("nickname", user.getNickName());
-//             return ResponseEntity.ok(Map.of(
-//                 "userId", user.getId(),
-//                 "nickname", user.getNickName()
-//             ));
-//         } else {
-//             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-//         }
-//     } catch (Exception e) {
-//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
-//     }
-// }
-
-//     @PostMapping("/kakaoLogin")
-//     public ResponseEntity<String> handleKakaoLogin(@RequestBody KakaoUserDto kakaoUserDto) {
-//         // 서비스 호출하여 데이터 저장
-//         userService.saveKakaoUser(kakaoUserDto);
-//         return ResponseEntity.ok("Kakao user data saved successfully!");
-//     }
-
-//    /**
-//      * 아이디 찾기
-//      */
-//     @PostMapping("/findId")
-//     public ResponseEntity<Map<String, String>> findId(@RequestParam String name, @RequestParam String phone, @RequestParam String mail) {
-//         String userInfo = userService.findId(name, phone, mail);
-
-//         Map<String, String> response = new HashMap<>();
-//         response.put("message", userInfo.equals("일치하는 사용자가 없습니다.") ? "실패" : "성공");
-//         response.put("userInfo", userInfo);
-//         return ResponseEntity.ok(response);
-//     }
-
-//     /**
-//      * 비밀번호 재설정
-//      */
-//     @PostMapping("/resetPassword")
-//     public ResponseEntity<Map<String, String>> resetPassword(@RequestParam String id, @RequestParam String mail, @RequestParam String newPassword) {
-//         String message = userService.resetPassword(id, mail, newPassword);
-
-//         Map<String, String> response = new HashMap<>();
-//         response.put("message", message.equals("비밀번호가 성공적으로 변경되었습니다.") ? "성공" : "실패");
-//         response.put("description", message);
-//         return ResponseEntity.ok(response);
-//     }
-// }

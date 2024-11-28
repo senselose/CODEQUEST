@@ -1,5 +1,7 @@
 package com.codequest.backend.entity;
 import java.time.LocalDate;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,7 +23,12 @@ public class User {
     private String grade;
     private String password;
     private String phone;
-    private String provider; // "kakao" or "local"
+    
+    @Column(name = "method", nullable = false)
+    private String method; // 기존 컬럼과 매핑
+    
+    @Column(name = "marketing", nullable = true)
+    private Integer marketing; // 마케팅 동의 여부
 
     // 기본 생성자
     public User() {}
@@ -96,11 +103,18 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    public String getProvider() {
-        return provider;
+    public String getMethod() {
+        return method;
     }
 
-    public void setProvider(String provider) {
-        this.provider = provider;
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public Integer getMarketing() {
+        return marketing;
+    }
+    public void setMarketing(Integer marketing) {
+        this.marketing = marketing;
     }
 }

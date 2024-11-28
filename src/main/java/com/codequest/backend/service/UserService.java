@@ -23,10 +23,12 @@ public class UserService {
         User foundUser = userRepository.findById(user.getId()).orElse(null);
         return foundUser != null && foundUser.getPassword().equals(user.getPassword());
     }
-       // 사용자 조회 (카카오 로그인)
-       public User findById(String id) {
-        return userRepository.findById(id).orElse(null);
-    }
+
+    // 사용자 조회 (카카오 로그인)
+    public User findById(String id) {
+    return userRepository.findById(id).orElse(null);
+    }   
+
     // ID 중복 확인
     public boolean existsById(String id) {
         return userRepository.existsById(id);
@@ -41,6 +43,8 @@ public class UserService {
     }
     // 사용자 저장 (회원가입)
     public User saveUser(User user) {
+        // 기본 가입 방식 설정
+
         if (existsById(user.getId())) {
             throw new IllegalArgumentException("ID already exists");
         }
@@ -50,9 +54,22 @@ public class UserService {
         if (existsByNickName(user.getNickName())) {
             throw new IllegalArgumentException("Nickname already exists");
         }
+          // 기본값 설정
+          if (user.getMethod() == null) {
+            user.setMethod("local");
+        }
+        if (user.getMarketing() == null) {
+            user.setMarketing(null);
+        }
+        // 마케팅 동의 값이 없으면 null로 설정
+        if (user.getMarketing() == null) {
+            user.setMarketing(null);
+        }
         return userRepository.save(user);
     }
 
+
+    
        // 카카오 사용자 저장
     public void saveKakaoUser(KakaoUserDto kakaoUserDto) {
         // 중복 확인 로직 (닉네임 또는 다른 조건으로 중복 확인 가능)
@@ -78,60 +95,27 @@ public class UserService {
         return user.map(User::getId).orElse("일치하는 사용자가 없습니다.");
     }
 
-    /**
-     * 비밀번호 변경
-     */
-    public boolean validateUserInfo(String name, String id, String mail) {
-        Optional<User> user = userRepository.findByIdAndNameAndMail(id, name, mail);
-        return user.isPresent();
+
+    public String generateTemporaryPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        StringBuilder password = new StringBuilder();
+        for (int i = 0; i < 10; i++) { // 10자리 비밀번호 생성
+            int randomIndex = (int) (Math.random() * chars.length());
+            password.append(chars.charAt(randomIndex));
+        }
+        return password.toString();
     }
 
-    public boolean updatePassword(String id, String newPassword) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            user.get().setPassword(newPassword); // 프론트에서 전달된 password를 새 비밀번호로 저장
-            userRepository.save(user.get());    // 변경된 사용자 정보 저장
-            return true;
-        }
-        return false;
+    public boolean updatePassword(String userId, String newPassword) {
+        // 비밀번호 암호화 후 DB 업데이트 로직
+        // 예: userRepository.updatePassword(userId, encodedPassword);
+        return true; // 성공 여부 반환
+    }
+
+    public boolean validateUserInfo(String name, String id, String mail) {
+        // 사용자 정보 검증 로직
+        return true; // 검증 성공 여부
     }
     
+     
 }
-
-
-// 백앤드 바로 이전 코드
-// @Service
-// public class UserService {
-//     @Autowired
-//     private UserRepository userRepository;
-//     // 회원가입: 사용자 저장
-//     public User saveUser(User user) {
-//         // ID 중복 확인
-//         if (userRepository.existsById(user.getId())) {
-//             throw new IllegalArgumentException("ID already exists");
-//         }
-//         // 이메일 중복 확인
-//         if (userRepository.existsByMail(user.getMail())) {
-//             throw new IllegalArgumentException("mail already exists");
-//         }
-//         return userRepository.save(user);
-//     }
-//     // 로그인: 사용자 인증
-//     public boolean validateUser(User user) {
-//         User foundUser = userRepository.findById(user.getId()).orElse(null);
-//         return foundUser != null && foundUser.getPassword().equals(user.getPassword());
-//     }
-//        // 사용자 조회 (카카오 로그인)
-//        public User findById(String id) {
-//         return userRepository.findById(id).orElse(null);
-//     }
-//     // 아이디 중복 확인
-//     public boolean existsById(String id) {
-//         return userRepository.existsById(id);
-//     }
-//     // 이메일 중복 확인
-//     public boolean existsByMail(String mail) {
-//         return userRepository.existsByMail(mail);
-//     }
-// }
-

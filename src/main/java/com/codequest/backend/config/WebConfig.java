@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -39,6 +40,13 @@ public class WebConfig implements WebMvcConfigurer{
                         ));
             }
         }
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // "uploads" 경로를 실제 디렉토리로 매핑
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:/Users/heeaelee/uploads/"); // 실제 파일 저장 경로
     }
 
 }

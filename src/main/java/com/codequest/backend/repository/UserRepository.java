@@ -32,7 +32,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     // 사용자 검색 메서드
     Optional<User> findByNameAndPhoneAndMail(String name, String phone, String mail);
-
     Optional<User> findByIdAndNameAndMail(String id, String name, String mail);
 
     @Transactional

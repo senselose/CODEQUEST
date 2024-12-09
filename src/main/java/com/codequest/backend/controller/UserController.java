@@ -50,10 +50,17 @@ public class UserController {
     }
 
     // 회원가입
+    // @PostMapping("/register")
+    // public ResponseEntity<User> register(@RequestBody User user) {
+    //     User savedUser = userService.saveUser(user);
+    //     return ResponseEntity.status(HttpStatus.CREATED).body(savedUser); // 리소스 생성으로 201이 반환
+    // }
+
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        User savedUser = userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    public ResponseEntity<?> register(@RequestBody User user) {
+        System.out.println("Marketing: " + user.getMarketing()); // 값 디버깅
+        userService.saveUser(user);
+        return ResponseEntity.status(HttpStatus.OK).body("User registered successfully"); // 200으로
     }
 
     // 로그인
@@ -95,7 +102,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // 비밀번호 재설정
     @PostMapping("/resetPassword")
     public ResponseEntity<Map<String, String>> resetPassword(@RequestBody User request) {
         // 사용자 정보 확인
@@ -103,10 +109,10 @@ public class UserController {
         Map<String, String> response = new HashMap<>();
 
         if (isValid) {
-            // 비밀번호 변경
-            boolean isUpdated = userService.updatePassword(request.getId(), request.getPassword());
+            String temporaryPassword = userService.generateTemporaryPassword();
+            boolean isUpdated = userService.updatePassword(request.getId(), temporaryPassword);
             if (isUpdated) {
-                response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
+                response.put("message", "임시 비밀번호가 성공적으로 설정되었습니다: " + temporaryPassword);
             } else {
                 response.put("message", "비밀번호 변경에 실패했습니다.");
             }
@@ -115,6 +121,7 @@ public class UserController {
         }
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
@@ -260,3 +267,5 @@ public class UserController {
 // return ResponseEntity.ok(response);
 // }
 // }
+
+

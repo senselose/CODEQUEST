@@ -36,8 +36,10 @@ public class UserService {
 
     // 사용자 조회 (카카오 로그인)
     public User findById(String id) {
+
         return userRepository.findById(id).orElse(null);
     }
+
 
     // ID 중복 확인
     public boolean existsById(String id) {
@@ -56,6 +58,8 @@ public class UserService {
 
     // 사용자 저장 (회원가입)
     public User saveUser(User user) {
+        // 기본 가입 방식 설정
+
         if (existsById(user.getId())) {
             throw new IllegalArgumentException("ID already exists");
         }
@@ -65,10 +69,23 @@ public class UserService {
         if (existsByNickName(user.getNickName())) {
             throw new IllegalArgumentException("Nickname already exists");
         }
+          // 기본값 설정
+          if (user.getMethod() == null) {
+            user.setMethod("local");
+        }
+        if (user.getMarketing() == null) {
+            user.setMarketing(null);
+        }
+        // 마케팅 동의 값이 없으면 null로 설정
+        if (user.getMarketing() == null) {
+            user.setMarketing(null);
+        }
         return userRepository.save(user);
     }
 
+
     // 카카오 사용자 저장
+
     public void saveKakaoUser(KakaoUserDto kakaoUserDto) {
         // 중복 확인 로직 (닉네임 또는 다른 조건으로 중복 확인 가능)
         if (userRepository.existsByNickName(kakaoUserDto.getNickname())) {
@@ -93,13 +110,7 @@ public class UserService {
         return user.map(User::getId).orElse("일치하는 사용자가 없습니다.");
     }
 
-    /**
-     * 비밀번호 변경
-     */
-    public boolean validateUserInfo(String name, String id, String mail) {
-        Optional<User> user = userRepository.findByIdAndNameAndMail(id, name, mail);
-        return user.isPresent();
-    }
+
 
     public boolean updatePassword(String id, String newPassword) {
         Optional<User> user = userRepository.findById(id);
@@ -108,8 +119,9 @@ public class UserService {
             userRepository.save(user.get()); // 변경된 사용자 정보 저장
             return true;
         }
-        return false;
+        return password.toString();
     }
+
 
     private final String uploadDir = "/Users/heeaelee/uploads/profile";
 
@@ -173,4 +185,4 @@ public class UserService {
 // public boolean existsByMail(String mail) {
 // return userRepository.existsByMail(mail);
 // }
-// }
+

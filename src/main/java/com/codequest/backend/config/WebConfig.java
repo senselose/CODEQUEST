@@ -20,8 +20,8 @@ public class WebConfig implements WebMvcConfigurer{
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        // .allowedOrigins("http://localhost:3000", "http://192.168.0.7:3000")
-                        .allowedOrigins("http://localhost:3000", "http://192.168.0.39:3000")
+                        .allowedOrigins("http://localhost:3000", "http://192.168.0.7:3000")
+                        // .allowedOrigins("http://localhost:3000", "http://192.168.0.39:3000", "http://http://168.126.63.2:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("Authorization", "Content-Type", "X-Requested-With")
                         .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
@@ -46,7 +46,7 @@ public class WebConfig implements WebMvcConfigurer{
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // "uploads" 경로를 실제 디렉토리로 매핑
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:/Users/heeaelee/uploads/"); // 실제 파일 저장 경로
+                .addResourceLocations("file:/Users/ahncoco/uploads/"); // 실제 파일 저장 경로
     }
 
 }

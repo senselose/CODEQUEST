@@ -203,7 +203,7 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("게시글 저장 중 오류가 발생했습니다: " + e.getMessage());
         }
-    }
+    }  
 
     // 특정 게시글 조회
     @GetMapping("/{id}")

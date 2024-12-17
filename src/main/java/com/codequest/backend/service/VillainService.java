@@ -23,44 +23,41 @@ public class VillainService {
         this.villainRepository = villainRepository;
     }
 
-    /**
-     * 빌런 이미지 저장
-     * @param villainName 빌런 이름
-     * @param files 업로드할 이미지 파일 리스트
-     * @throws IOException 파일 저장 중 발생하는 예외
-     */
-    public void saveVillainImages(String villainName, List<MultipartFile> files) throws IOException {
-        // 빌런 이름으로 Villain 엔티티 조회
-        Villain villain = villainRepository.findByName(villainName);
-        if (villain == null) {
-            throw new IllegalArgumentException("빌런 이름이 유효하지 않습니다: " + villainName);
-        }
-
-        // 빌런별 폴더 경로 설정
-        String villainFolder = uploadDir + "/" + villain.getFolderName();
-        File folder = new File(villainFolder);
+    public void saveVillainImages(String villainName, String category, Long boardId, List<MultipartFile> files) throws IOException {
+        // 폴더 경로 설정
+        String folderPath = uploadDir + "/villain/" + category; // 경로 수정
+        File folder = new File(folderPath);
         if (!folder.exists()) {
             folder.mkdirs(); // 폴더가 없으면 생성
         }
-
-        List<Villain> images = new ArrayList<>();
+    
+        // 파일 저장 및 Villain 엔티티 저장
+        List<Villain> villains = new ArrayList<>();
         for (MultipartFile file : files) {
-            // 고유 파일 이름 생성
             String uniqueFileName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
-            String filePath = villainFolder + "/" + uniqueFileName;
-
+            String filePath = folderPath + "/" + uniqueFileName;
+    
+            // 파일 저장
             File dest = new File(filePath);
-            file.transferTo(dest); // 파일 저장
-
-            // Villain 엔티티의 이미지 정보 업데이트
-            Villain image = new Villain();
-            image.setFilePath(villain.getFolderName() + "/" + uniqueFileName);
-            image.setFileName(uniqueFileName);
-
-            images.add(image);
+            file.transferTo(dest);
+    
+            // Villain 엔티티 생성
+            Villain villain = new Villain();
+            villain.setVillainName(villainName); // 빌런 이름 설정
+            villain.setCategory(category); // 카테고리 저장
+            villain.setFileName(uniqueFileName); // 고유 파일 이름 저장
+            villain.setFilePath("villain/" + category + "/" + uniqueFileName); // 상대 경로 저장
+            villain.setBoardId(boardId); // 보드 ID 설정
+    
+            villains.add(villain); // 리스트에 추가
         }
-
-        // VillainRepository를 통해 저장
-        villainRepository.saveAll(images);
+    
+        // 데이터베이스에 저장
+        villainRepository.saveAll(villains);
     }
-}
+
+    public List<Villain> getVillainsByCategory(String category) {
+        return villainRepository.findByCategory(category);
+    }
+    
+}    

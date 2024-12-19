@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -19,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.io.File;
-
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = { "http://localhost:3000", "http://192.168.0.7:3000" })
@@ -50,26 +50,6 @@ public class UserController {
         User savedUser = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
-    // // 로그인
-    // @PostMapping("/login")
-    // public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
-    //     try {
-    //         boolean isAuthenticated = userService
-    //                 .validateUser(new User(loginRequest.getId(), loginRequest.getPassword()));
-    //         if (isAuthenticated) {
-    //             User user = userService.findById(loginRequest.getId());
-    //             session.setAttribute("userId", user.getId());
-    //             session.setAttribute("nickname", user.getNickName());
-    //             return ResponseEntity.ok(Map.of(
-    //                     "userId", user.getId(),
-    //                     "nickname", user.getNickName()));
-    //         } else {
-    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-    //         }
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
-    //     }
-    // }
 
     // 로그인
     @PostMapping("/login")
@@ -118,6 +98,7 @@ public class UserController {
         String userId = userService.getUserIdFromToken(token); // 토큰에서 사용자 ID 추출
         return ResponseEntity.ok(Map.of("userId", userId));
     }
+
 
     // 카카오 로그인
     @PostMapping("/kakaoLogin")
@@ -181,6 +162,7 @@ public class UserController {
                     .body(Map.of("error", "이미지 업로드 실패: " + e.getMessage()));
         }
     }
+
 
     // 마이페이지 회원정보 수정 후 업데이트
     @PutMapping("/{id}/update")

@@ -1,5 +1,6 @@
 package com.codequest.backend.service;
 
+
 import java.util.Date; // 지은 추가
 
 import com.codequest.backend.dto.KakaoUserDto;
@@ -24,14 +25,6 @@ import java.nio.file.Paths;
 
 import java.util.Optional;
 import java.util.UUID;
-// @Service
-// public class UserService {
-//     @Autowired
-//     private UserRepository userRepository;
-//     public User saveUser(User user) {
-//         return userRepository.save(user);
-//     }
-// }
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -276,7 +269,10 @@ public class UserService {
         }
         return false;
     }
+
     private final String uploadDir = "/Users/jieunseo/uploads/profile";
+    //private final String uploadDir = "/Users/ahncoco/uploads/profile";
+
     public String saveProfilePicture(String userId, MultipartFile file) throws IOException {
         // 디렉토리가 없으면 생성
         File directory = new File(uploadDir);
@@ -331,4 +327,5 @@ public class UserService {
         }
         return false;
     }
+
 }

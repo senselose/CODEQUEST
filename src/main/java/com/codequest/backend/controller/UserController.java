@@ -8,6 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -46,17 +50,29 @@ public class UserController {
         User savedUser = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
+
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         try {
             boolean isAuthenticated = userService
                     .validateUser(new User(loginRequest.getId(), loginRequest.getPassword()));
             if (isAuthenticated) {
                 User user = userService.findById(loginRequest.getId());
-                session.setAttribute("userId", user.getId());
-                session.setAttribute("nickname", user.getNickName());
+
+                // JWT 생성
+                String token = userService.generateToken(user);
+
+                // HttpOnly 쿠키에 JWT 저장
+                Cookie cookie = new Cookie("token", token);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(true); // HTTPS에서만 동작 (개발 환경에서는 false 가능)
+                cookie.setPath("/");
+                cookie.setMaxAge(60 * 60 * 24); // 1일
+                response.addCookie(cookie);
+
                 return ResponseEntity.ok(Map.of(
+                        "token", token, // 클라이언트에 JWT 반환 (지은 추가))
                         "userId", user.getId(),
                         "nickname", user.getNickName()));
             } else {
@@ -66,6 +82,24 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
     }
+
+    // 인증 확인 API 추가
+    @GetMapping("/check")
+    public ResponseEntity<?> checkAuth(@RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+    
+        String token = authorizationHeader.replace("Bearer ", ""); // Bearer 제거
+        if (!userService.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+    
+        String userId = userService.getUserIdFromToken(token); // 토큰에서 사용자 ID 추출
+        return ResponseEntity.ok(Map.of("userId", userId));
+    }
+
+
     // 카카오 로그인
     @PostMapping("/kakaoLogin")
     public ResponseEntity<String> handleKakaoLogin(@RequestBody KakaoUserDto kakaoUserDto) {
@@ -104,6 +138,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
         User user = userService.findById(id); // id로 사용자 조회
+        System.out.println("가져온 사용자 데이터: " + user.toString());
         if (user != null) {
             return ResponseEntity.ok(user);
         } else {
@@ -127,4 +162,54 @@ public class UserController {
                     .body(Map.of("error", "이미지 업로드 실패: " + e.getMessage()));
         }
     }
+
+
+    // 마이페이지 회원정보 수정 후 업데이트
+    @PutMapping("/{id}/update")
+    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User updateUser) {
+        try {
+            User user = userService.updateUser(id, updateUser);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // 마이페이지 회원정보 수정시 비밀번호 확인
+    @PostMapping("/{id}/check-password")
+    public ResponseEntity<Map<String, String>> checkPassword(@PathVariable String id, @RequestBody Map<String, String> request) {
+        String password = request.get("password");
+        boolean isValid = userService.checkPassword(id, password);
+        if (isValid) {
+            return ResponseEntity.ok(Map.of("success", "true", "message", "비밀번호가 일치합니다."));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", "false", "message", "비밀번호가 일치하지 않습니다."));
+        }
+    }
+    
+    // 자기소개 수정 API
+    @PutMapping("/{userId}/updateInfo")
+    public ResponseEntity<?> updateUserBio(
+            @PathVariable String userId, 
+            @RequestBody Map<String, String> payload) {
+
+        String newInfo = payload.get("info"); // 수정된 자기소개 내용
+
+        boolean isUpdated = userService.updateUserInfo(userId, newInfo);
+        if (isUpdated) {
+            return ResponseEntity.ok().body(Map.of("message", "자기소개 수정 성공"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "자기소개 수정 실패"));
+        }
+    }
 }
+
+
+
+
+
+
+
+
+

@@ -23,6 +23,9 @@ public class User {
     private String grade;
     private String password;
     private String phone;
+
+    @Column(name = "info", nullable = true, length = 255)
+    private String info; // 자기소개
     
     @Column(name = "method", nullable = false)
     private String method; // 기존 컬럼과 매핑
@@ -116,5 +119,12 @@ public class User {
     }
     public void setMarketing(Integer marketing) {
         this.marketing = marketing;
+    }
+    
+    public String getInfo() {
+        return info;
+    }
+    public void setInfo(String info) {
+        this.info = info;
     }
 }
